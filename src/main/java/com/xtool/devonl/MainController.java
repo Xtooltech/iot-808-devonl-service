@@ -140,5 +140,40 @@ public class MainController {
 			}
 		}
 		return result;
-	} 
+	}
+    
+    
+    /**
+     * 批量添加或修改指定的文档。
+     * @param ignoreNull 是否忽略未设置的属性，false表示将未设置的属性值设置为null。
+     * @param models 要添加或修改的文档数据。
+     * @return 操作成功返回true，否则返回false。
+     */
+    @RequestMapping(value="/devonl/bupsert",method= {RequestMethod.POST})
+    public RespState<Boolean> upsert(
+        @RequestParam(name="ignoreNull",required=false)
+        @Nullable
+            Boolean ignoreNull
+        , @RequestBody
+              devonlModel[] models){
+        RespState<Boolean> result=new RespState<Boolean>();
+        boolean ignull=true;
+        if(ignoreNull!=null)ignull=ignoreNull;
+        if(models==null || models.length < 1) {
+            result.setCode(406);
+            result.setMsg("Not acceptable");
+            result.setData(false);
+        }else {
+            try {
+                result.setData(dataMaintainer.bupsert(models, ignull));
+                result.setCode(0);
+                result.setMsg("ok");
+            }catch(Exception ex) {
+                result.setData(false);
+                result.setCode(500);
+                result.setMsg(ex.getMessage());
+            }
+        }
+        return result;
+    }
 }
